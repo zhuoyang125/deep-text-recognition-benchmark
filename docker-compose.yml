@@ -15,6 +15,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:ro
       - ./custom_datasets/result:/home/root/deep-text-recognition-benchmark/custom_datasets/result
       - ./runs:/home/root/deep-text-recognition-benchmark/runs
+      - ./saved_models:/home/root/deep-text-recognition-benchmark/saved_models
     environment:
       - DISPLAY=$DISPLAY
       - NVIDIA_VISIBLE_DEVICES=all
