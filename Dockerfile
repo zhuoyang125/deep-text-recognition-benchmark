@@ -330,7 +330,7 @@ RUN mkdir custom_datasets
 ENV FORCE_CUDA="0"
 
 # Extra packages
-RUN pip install --no-cache-dir Pillow==2.2.1
+RUN pip install --no-cache-dir Pillow==5.1.0
 
 # This will build detectron2 for all common cuda architectures and take a lot more time,
 # because inside `docker build`, there is no way to tell which architecture will be used.
