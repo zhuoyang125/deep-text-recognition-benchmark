@@ -18,8 +18,10 @@ from model import Model
 from test import validation
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+from tensorboardX import SummaryWriter       # importing tensorboard
 
-def train(opt):
+
+def train(opt, tb):
     """ dataset preparation """
     if not opt.data_filtering_off:
         print('Filtering the images containing characters which are not in opt.character')
@@ -183,9 +185,13 @@ def train(opt):
 
                 # training loss and validation loss
                 loss_log = f'[{i}/{opt.num_iter}] Train loss: {loss_avg.val():0.5f}, Valid loss: {valid_loss:0.5f}, Elapsed_time: {elapsed_time:0.5f}'
+                tb.add_scalar('Training Loss vs Iteration', loss_avg.val(), i)              # Record to Tensorboard
+                tb.add_scalar('Validation Loss vs Iteration', valid_loss, i)                # Record to Tensorboard
                 loss_avg.reset()
 
                 current_model_log = f'{"Current_accuracy":17s}: {current_accuracy:0.3f}, {"Current_norm_ED":17s}: {current_norm_ED:0.2f}'
+                tb.add_scalar('Current Accuracy vs Iteration', current_accuracy, i)         # Record to Tensorboard
+                tb.add_scalar('Current Norm ED vs Iteration', current_norm_ED, i)           # Record to Tensorboard            
 
                 # keep best accuracy model (on valid dataset)
                 if current_accuracy > best_accuracy:
@@ -318,4 +324,10 @@ if __name__ == '__main__':
         opt.num_iter = int(opt.num_iter / opt.num_gpu)
         """
 
-    train(opt)
+    tb = SummaryWriter(comment=' Modules: = <' + str(opt.Transformation) + '-' + str(opt.FeatureExtraction) + '-' + str(opt.SequenceModeling) + '-' + str(opt.Prediction) + '>' +
+                        ', num_iter = ' + str(opt.num_iter) +
+                        ', batch_size = ' + str(opt.batch_size) +
+                        ', learning_rate = ' + str(opt.lr) +
+                        ', hidden_size = ' + str(opt.hidden_size))
+
+    train(opt, tb)
