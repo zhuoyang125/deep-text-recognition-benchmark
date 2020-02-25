@@ -97,9 +97,13 @@ def train(opt, tb):
     # filter that only require gradient decent
     filtered_parameters = []
     params_num = []
+    print("~~~~~~~~~~~~Gradient Descent~~~~~~~~~~~~~")
+    #print(model.parameters())
+    #print(model.)
     for p in filter(lambda p: p.requires_grad, model.parameters()):
         filtered_parameters.append(p)
         params_num.append(np.prod(p.size()))
+    print('Filtered parameters for gradient descent: \n', len(filtered_parameters))
     print('Trainable params num : ', sum(params_num))
     # [print(name, p.numel()) for name, p in filter(lambda p: p[1].requires_grad, model.named_parameters())]
 
