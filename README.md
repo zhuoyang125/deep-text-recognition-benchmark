@@ -209,6 +209,12 @@ to train/infer images using:
 python train.py --saved_model saved_models/TPS-ResNet-BiLSTM-Attn.pth --rgb --Transformation TPS --FeatureExtraction RCNN --SequenceModeling BiLSTM --Prediction CTC --select_data custom_datasets/result/validation/
 ```
 
+## Download Pretrained Models Here
+
+* For pretrained models that are trained with alphanumeric characters, see the original GitHub repo.
+
+* For pretrained models that are trained with integers and floats only, download [here](https://drive.google.com/open?id=1VNHshE4eXO9FaZppxy2edVszDxUsbIDq).
+
 **Stay tune for more updates!!**
 
 # What Is Wrong With Scene Text Recognition Model Comparisons? Dataset and Model Analysis
