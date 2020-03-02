@@ -18,8 +18,10 @@ from model import Model
 from test import validation
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+from tensorboardX import SummaryWriter       # importing tensorboard
 
-def train(opt):
+
+def train(opt, tb):
     """ dataset preparation """
     if not opt.data_filtering_off:
         print('Filtering the images containing characters which are not in opt.character')
@@ -95,9 +97,13 @@ def train(opt):
     # filter that only require gradient decent
     filtered_parameters = []
     params_num = []
+    print("~~~~~~~~~~~~Gradient Descent~~~~~~~~~~~~~")
+    #print(model.parameters())
+    #print(model.)
     for p in filter(lambda p: p.requires_grad, model.parameters()):
         filtered_parameters.append(p)
         params_num.append(np.prod(p.size()))
+    print('Filtered parameters for gradient descent: \n', len(filtered_parameters))
     print('Trainable params num : ', sum(params_num))
     # [print(name, p.numel()) for name, p in filter(lambda p: p[1].requires_grad, model.named_parameters())]
 
@@ -183,9 +189,13 @@ def train(opt):
 
                 # training loss and validation loss
                 loss_log = f'[{i}/{opt.num_iter}] Train loss: {loss_avg.val():0.5f}, Valid loss: {valid_loss:0.5f}, Elapsed_time: {elapsed_time:0.5f}'
+                tb.add_scalar('Training Loss vs Iteration', loss_avg.val(), i)              # Record to Tensorboard
+                tb.add_scalar('Validation Loss vs Iteration', valid_loss, i)                # Record to Tensorboard
                 loss_avg.reset()
 
                 current_model_log = f'{"Current_accuracy":17s}: {current_accuracy:0.3f}, {"Current_norm_ED":17s}: {current_norm_ED:0.2f}'
+                tb.add_scalar('Current Accuracy vs Iteration', current_accuracy, i)         # Record to Tensorboard
+                tb.add_scalar('Current Norm ED vs Iteration', current_norm_ED, i)           # Record to Tensorboard            
 
                 # keep best accuracy model (on valid dataset)
                 if current_accuracy > best_accuracy:
@@ -244,9 +254,13 @@ if __name__ == '__main__':
     parser.add_argument('--eps', type=float, default=1e-8, help='eps for Adadelta. default=1e-8')
     parser.add_argument('--grad_clip', type=float, default=5, help='gradient clipping value. default=5')
     """ Data processing """
-    parser.add_argument('--select_data', type=str, default='MJ-ST',
+    #parser.add_argument('--select_data', type=str, default='MJ-ST',
+    #                    help='select training data (default is MJ-ST, which means MJ and ST used as training data)')
+    parser.add_argument('--select_data', type=str, default='/',
                         help='select training data (default is MJ-ST, which means MJ and ST used as training data)')
-    parser.add_argument('--batch_ratio', type=str, default='0.5-0.5',
+    #parser.add_argument('--batch_ratio', type=str, default='0.5-0.5',
+    #                    help='assign ratio for each selected data in the batch')
+    parser.add_argument('--batch_ratio', type=str, default='1',
                         help='assign ratio for each selected data in the batch')
     parser.add_argument('--total_data_usage_ratio', type=str, default='1.0',
                         help='total data usage ratio, this ratio is multiplied to total number of data.')
@@ -254,8 +268,10 @@ if __name__ == '__main__':
     parser.add_argument('--imgH', type=int, default=32, help='the height of the input image')
     parser.add_argument('--imgW', type=int, default=100, help='the width of the input image')
     parser.add_argument('--rgb', action='store_true', help='use rgb input')
-    parser.add_argument('--character', type=str,
+    #parser.add_argument('--character', type=str,
                         default='0123456789abcdefghijklmnopqrstuvwxyz', help='character label')
+    parser.add_argument('--character', type=str,
+                        default='.0123456789', help='character label')
     parser.add_argument('--sensitive', action='store_true', help='for sensitive character mode')
     parser.add_argument('--PAD', action='store_true', help='whether to keep ratio then pad for image resize')
     parser.add_argument('--data_filtering_off', action='store_true', help='for data_filtering_off mode')
@@ -312,4 +328,10 @@ if __name__ == '__main__':
         opt.num_iter = int(opt.num_iter / opt.num_gpu)
         """
 
-    train(opt)
+    tb = SummaryWriter(comment=' Modules: = <' + str(opt.Transformation) + '-' + str(opt.FeatureExtraction) + '-' + str(opt.SequenceModeling) + '-' + str(opt.Prediction) + '>' +
+                        ', num_iter = ' + str(opt.num_iter) +
+                        ', batch_size = ' + str(opt.batch_size) +
+                        ', learning_rate = ' + str(opt.lr) +
+                        ', hidden_size = ' + str(opt.hidden_size))
+
+    train(opt, tb)

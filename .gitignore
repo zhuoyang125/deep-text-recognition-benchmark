@@ -6,11 +6,15 @@
 *.pth
 *.tar
 *.sh
-*.txt
+#*.txt
 *.ipynb
 *.zip
 *.eps
 *.pdf
+
+/custom_datasets/converted_custom_data/*
+/custom_datasets/converted_custom_data_validation/*
+/custom_datasets/tmp_images/*
 
 ### Linux ###
 *~

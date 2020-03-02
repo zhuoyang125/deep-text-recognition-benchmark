@@ -57,6 +57,8 @@ class ResNet_FeatureExtractor(nn.Module):
     def __init__(self, input_channel, output_channel=512):
         super(ResNet_FeatureExtractor, self).__init__()
         self.ConvNet = ResNet(input_channel, output_channel, BasicBlock, [1, 2, 5, 3])
+        #for param in self.ConvNet.parameters():
+        #    param.requires_grad = False
 
     def forward(self, input):
         return self.ConvNet(input)

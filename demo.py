@@ -35,6 +35,7 @@ def demo(opt):
     # prepare data. two demo images from https://github.com/bgshih/crnn#run-demo
     AlignCollate_demo = AlignCollate(imgH=opt.imgH, imgW=opt.imgW, keep_ratio_with_pad=opt.PAD)
     demo_data = RawDataset(root=opt.image_folder, opt=opt)  # use RawDataset
+    print(demo_data[0])
     demo_loader = torch.utils.data.DataLoader(
         demo_data, batch_size=opt.batch_size,
         shuffle=False,
@@ -46,7 +47,9 @@ def demo(opt):
     with torch.no_grad():
         for image_tensors, image_path_list in demo_loader:
             batch_size = image_tensors.size(0)
+            print(batch_size)
             image = image_tensors.to(device)
+            print(image.size())
             # For max length prediction
             length_for_pred = torch.IntTensor([opt.batch_max_length] * batch_size).to(device)
             text_for_pred = torch.LongTensor(batch_size, opt.batch_max_length + 1).fill_(0).to(device)
