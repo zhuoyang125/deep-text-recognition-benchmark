@@ -1,3 +1,216 @@
+# Extra Instructions for Added-On Features
+**New features include:**
+
+* Real-Time Video Text Recognition
+
+* and .... more stuffs in the future!
+
+## __Note:__
+
+Our task is to train the Scene Text Recognition (STR) model such that it can recognise numbers with decimal points (one of the special characters), or floating point numbers. However, there is no proper dataset online that has images with floating point numbers. As a result, there is a need to generate our own floating point numbers dataset and to train the STR model to recognise them with high confidence score.
+
+We used 3 types of dataset to do the training and validation:
+
+* Synthetic Floats generated using OpenCV2
+
+* Synthetic Floats generated using [TextRecognitionDataGenerator](https://github.com/Belval/TextRecognitionDataGenerator) (Special thanks to original author)
+
+* Digits from Street View House Numbers (SVHN) 32 x 32 datasets (Stay tune for instructions)
+
+**Our training and validation datasets consist only of integers and floating numbers. There is no training on alphabets! Therefore, the pretrained models provided below can only be used for inferring integers and floats.**
+
+## __Synthetic Floats generated using OpenCV2__
+
+By using `rand_crop_simple.py` in the root folder, we can generate random synthetic floats based on:
+
+* Fonts
+
+* Thickness of fonts
+
+* Color of fonts
+
+* Scale of fonts
+
+* Noises
+
+* Blurs
+
+The floats generated will be superimposed on a cropped image (base image to be added by you).
+
+**How to create Synthetic Floats using OpenCV2:**
+
+1. Create folders:
+
+```
+deep-text-recognition-benchmark/
+  custom_datasets/
+    converted_custom_data/
+      training/
+      validation/
+      rand_crop_simple.py
+```
+
+2. Open `rand_crop_simple.py`.
+
+3. Refer to the lines after:
+
+```
+if __name__ == '__main__':
+```
+
+4. Add a base image. Ignore this step if you are using the default `landscape.jpg`.
+
+```
+image = cv2.imread('<path to your image>')
+```
+
+5. To create a ground truth .txt when generating the images, set the ground truth text file name at the line:
+
+```
+f = open('<ground truth text file>', 'w+')
+```
+
+Example:
+
+```
+f = open('gt_training.txt', 'w+')
+```
+
+Also, name the generated images at the line:
+
+```
+cv2.imwrite('<name of image>' + str(i) +'.jpg', numbered)
+```
+
+Example:
+
+```
+cv2.imwrite('train' + str(i) +'.jpg', numbered)
+```
+
+Finally, ensure that the ground truth text file records the correct directory to read the images and their respective labels. Edit the line:
+
+```
+f.write('<path to images>' + str(i) + '.jpg\t' + str(formatted_value) + '\n')
+```
+
+Example:
+
+```
+f.write('converted_custom_data/training/train' + str(i) + '.jpg\t' + str(formatted_value) + '\n')
+```
+
+6. Run `rand_crop_simple.py` with the arguments:
+
+
+Numbers of images you want to generate:
+
+```
+-n <no. of images you want to generate>
+```
+
+Example:
+
+```
+-n 10000
+```
+
+Note: By default, the images will be generated in the same directory as `rand_crop_simple.py`.
+
+Range of decimal places allowable for your floats:
+
+```
+-d <lower decimal limit> <upper decimal limit>
+```
+
+Example:
+
+```
+-d 0 3
+```
+
+Example of command to use:
+
+```
+python rand_crop_simple.py -n 10000 -d 0 3
+```
+
+7. After generating, move the images into the respective folders depending on how they are named. For example, if the images are to be used for training, move the images into:
+
+`deep-text-recognition-benchmark/custom_datasets/training/`
+
+8. Return back to:
+
+`deep-text-recognition-benchmark/custom_datasets/`
+
+9. Convert images and ground truth text to lmdb dataset by:
+
+```
+python create_lmdb_dataset.py --inputPath ./ --gtFile converted_custom_data/<ground truth file you named>.txt --outputPath result/<training or validation>
+```
+
+Example:
+
+```
+python create_lmdb_dataset.py --inputPath ./ --gtFile converted_custom_data/gt_training.txt --outputPath result/training/
+```
+
+10. DONE! If you face any trouble, please message **`gordonjun2`** or **`zhuoyang125`**.
+
+11. Repeat the instructions if you want to create another set of data (eg. validation dataset)
+
+## How to use Real-Time Video Text Recognition
+
+1. If RGB is to be used, run the command:
+
+```
+python video_demo.py --saved_model <path of saved model> --Transformation <follow the model> --FeatureExtraction <follow the model> --SequenceModeling <follow the model> --Prediction <follow the model> --character <characters used in model> --file <path to video file> --rgb
+```
+
+If Monotone is to be used, run the command:
+
+```
+python video_demo.py --saved_model <path of saved model> --Transformation <follow the model> --FeatureExtraction <follow the model> --SequenceModeling <follow the model> --Prediction <follow the model> --character <characters used in model> --file <path to video file>
+```
+
+Example:
+
+```
+python video_demo.py --saved_models/float_models/TPS-ResNet-BiLSTM-CTC-Seed1111/saved_custom_v6_rgb/best_accuracy.pth --Transformation TPS --FeatureExtraction ResNet --SequenceModeling BiLSTM --Prediction CTC --character '.0123456789' --file  --rgb video_samples/olympics_time.mp4 --rgb
+```
+
+2. Enjoy!
+
+## __Special Notes__
+
+* The pretrained models provided in the original repo (see below) is only valid if you are inferring **alphanumeric** characters, that is:
+
+`0123456789abcdefghijklmnopqrstuvwxyz`
+
+* The pretrained models provided in the original repo were trained on monotone setting. **Do not use --rgb in the arguments.**
+
+* The pretrained models provided by us (see the next section) is only valid if you are inferring **integers or floating numbers** characters, that is:
+
+`.0123456789`
+
+* The pretrained models provided by us (see the next section) were trained in both RGB and monotone setting. See the folder names. **Use --rgb accordingly.**
+
+* You cannot use a pretrained model on one setting to train or infer images on another setting.
+
+For example, you cannot use a pretrained model that is trained using:
+
+```
+TPS-ResNet-BiLSTM-Attn, non-RGB
+```
+
+to train/infer images using:
+
+```
+python train.py --saved_model saved_models/TPS-ResNet-BiLSTM-Attn.pth --rgb --Transformation TPS --FeatureExtraction RCNN --SequenceModeling BiLSTM --Prediction CTC --select_data custom_datasets/result/validation/
+```
+
+**Stay tune for more updates!!**
+
 # What Is Wrong With Scene Text Recognition Model Comparisons? Dataset and Model Analysis
 | [paper](https://arxiv.org/abs/1904.01906) | [training and evaluation data](https://github.com/clovaai/deep-text-recognition-benchmark#download-lmdb-dataset-for-traininig-and-evaluation-from-here) | [failure cases and cleansed label](https://github.com/clovaai/deep-text-recognition-benchmark#download-failure-cases-and-cleansed-label-from-here) | [pretrained model](https://drive.google.com/drive/folders/15WPsuPJDCzhp2SvYZLRj8mAlT3zmoAMW) | [Baidu ver(passwd:rryk)](https://pan.baidu.com/s/1KSNLv4EY3zFWHpBYlpFCBQ) |
 
