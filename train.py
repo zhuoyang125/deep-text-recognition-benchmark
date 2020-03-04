@@ -166,7 +166,9 @@ def train(opt, tb):
 
         else:
             preds = model(image, text[:, :-1])  # align with Attention.forward
+            print(preds[0][0])
             target = text[:, 1:]  # without [GO] Symbol
+            print(target[0])
             cost = criterion(preds.view(-1, preds.shape[-1]), target.contiguous().view(-1))
 
         model.zero_grad()
@@ -268,10 +270,10 @@ if __name__ == '__main__':
     parser.add_argument('--imgH', type=int, default=32, help='the height of the input image')
     parser.add_argument('--imgW', type=int, default=100, help='the width of the input image')
     parser.add_argument('--rgb', action='store_true', help='use rgb input')
-    #parser.add_argument('--character', type=str,
-                        default='0123456789abcdefghijklmnopqrstuvwxyz', help='character label')
     parser.add_argument('--character', type=str,
-                        default='.0123456789', help='character label')
+                        default='0123456789abcdefghijklmnopqrstuvwxyz', help='character label')
+    #parser.add_argument('--character', type=str,
+    #                    default='.0123456789', help='character label')
     parser.add_argument('--sensitive', action='store_true', help='for sensitive character mode')
     parser.add_argument('--PAD', action='store_true', help='whether to keep ratio then pad for image resize')
     parser.add_argument('--data_filtering_off', action='store_true', help='for data_filtering_off mode')
@@ -299,8 +301,10 @@ if __name__ == '__main__':
 
     """ vocab / character number configuration """
     if opt.sensitive:
-        # opt.character += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        opt.character = string.printable[:-6]  # same with ASTER setting (use 94 char).
+        opt.character += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ             .                  ' #'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        #opt.character += '                                       .                  '
+        #opt.character = string.printable[:-6]  # same with ASTER setting (use 94 char).
+        print(opt.character)
 
     """ Seed and GPU setting """
     # print("Random Seed: ", opt.manualSeed)
