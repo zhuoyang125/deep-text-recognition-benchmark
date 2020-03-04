@@ -195,7 +195,7 @@ python video_demo.py --saved_models/float_models/TPS-ResNet-BiLSTM-CTC-Seed1111/
 
 * The pretrained models provided by us (see the next section) were trained in both RGB and monotone setting. See the folder names. **Use --rgb accordingly.**
 
-* You cannot use a pretrained model on one setting to train or infer images on another setting.
+* Strictly, you cannot use a pretrained model on one setting to train or infer images on another setting. See the next pointer if you want to do otherwise.
 
 For example, you cannot use a pretrained model that is trained using:
 
@@ -206,8 +206,16 @@ TPS-ResNet-BiLSTM-Attn, non-RGB
 to train/infer images using:
 
 ```
-python train.py --saved_model saved_models/TPS-ResNet-BiLSTM-Attn.pth --rgb --Transformation TPS --FeatureExtraction RCNN --SequenceModeling BiLSTM --Prediction CTC --select_data custom_datasets/result/validation/
+python train.py --saved_model saved_models/TPS-ResNet-BiLSTM-Attn.pth --rgb --Transformation TPS --FeatureExtraction RCNN --SequenceModeling BiLSTM --Prediction CTC --train_data custom_datasets/result/training_v3 --valid_data custom_datasets/result/validation_v3 --batch_size 8
 ```
+
+* To use a pretrained model that was trained on one setting to train on setting setting (eg. Using TPS-ResNet-BiLSTM-Attn model on TPS-ResNet-BiLSTM-CTC setting with different characters):
+
+```
+python train.py --saved_model saved_models/TPS-ResNet-BiLSTM-Attn.pth --rgb --Transformation TPS --FeatureExtraction RCNN --SequenceModeling BiLSTM --Prediction CTC --train_data custom_datasets/result/training_v3 --valid_data custom_datasets/result/validation_v3 --FT --sensitive --batch_size 8
+```
+
+Also, to replace unwanted characters in the full list of op.character with --sensitive, edit extra opt.character in `train.py` and replace unwanted characters with the ones you need. You can also remove extra unwanted characters by replacing them with spaces (eg. '?' -> ' ').
 
 ## Download Pretrained Models Here
 
