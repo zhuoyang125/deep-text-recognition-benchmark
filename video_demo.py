@@ -25,7 +25,7 @@ def show_video(model, opt):
 
     cap = cv2.VideoCapture(opt.file_dir)
 
-    cap2 = cv2.VideoCapture('ANW.mp4')
+    #cap2 = cv2.VideoCapture('ANW.mp4')
 
     fps = cap.get(cv2.CAP_PROP_FPS)
     print("FPS:" + str(fps))
@@ -50,15 +50,15 @@ def show_video(model, opt):
     while cap.isOpened():
         ret, frame = cap.read()
 
-        ret2, frame2 = cap2.read()
-        frame2 = cv2.resize(frame2, (0, 0), None, .6, .6)
+        #ret2, frame2 = cap2.read()
+        #frame2 = cv2.resize(frame2, (0, 0), None, .6, .6)
 
         #print(frame.shape)
-        cv2.rectangle(frame2, (558, 43), (612, 67), (0,0, 255), 2)
+        #cv2.rectangle(frame2, (558, 43), (612, 67), (0,0, 255), 2)
         cv2.imshow("Frame", frame)
-        cv2.moveWindow("Frame", 270, 650)
-        cv2.imshow("Frame2", frame2)
-        cv2.moveWindow("Frame2", 70, 100)
+        #cv2.moveWindow("Frame", 270, 650)
+        #cv2.imshow("Frame2", frame2)
+        #cv2.moveWindow("Frame2", 70, 100)
         frame_count += 1
         if ret:
             #time.sleep(0.1)
