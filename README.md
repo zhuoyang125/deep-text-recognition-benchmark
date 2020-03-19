@@ -176,7 +176,7 @@ python video_demo.py --saved_model <path of saved model> --Transformation <follo
 Example:
 
 ```
-python video_demo.py --saved_models/float_models/TPS-ResNet-BiLSTM-CTC-Seed1111/saved_custom_v6_rgb/best_accuracy.pth --Transformation TPS --FeatureExtraction ResNet --SequenceModeling BiLSTM --Prediction CTC --character '.0123456789' --file  --rgb video_samples/olympics_time.mp4 --rgb
+python video_demo.py --saved_models/float_models/TPS-ResNet-BiLSTM-CTC-Seed1111/saved_custom_v6_rgb/best_accuracy.pth --Transformation TPS --FeatureExtraction ResNet --SequenceModeling BiLSTM --Prediction CTC --character '.0123456789' --file video_samples/olympics_time.mp4 --rgb
 ```
 
 2. Enjoy!
